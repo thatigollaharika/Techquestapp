@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interactive Quiz App - Mobile Friendly</title>
+<style>
+/* General Styles */
+body { font-family: Arial, sans-serif; 
+         background: #f4f7fc;
+         display: flex; 
+         justify-content: center; 
+         align-items: center; min-height: 100vh; 
+         margin:0; 
+         padding:10px; 
+        }
+.quiz-container { 
+         background: #fff;
+         width: 100%; 
+         max-width: 600px; 
+         padding: 20px; 
+         border-radius: 12px; 
+         box-shadow: 0px 4px 12px rgba(0,0,0,0.1);
+         text-align: center;
+         position: relative;
+         box-sizing: border-box; 
+        }
+h2 { 
+         margin-bottom: 15px; 
+         color: #333; 
+         font-size: 1.2em; 
+}
+.options {
+         list-style: none; 
+         padding: 0; 
+         text-align: left;
+         margin:0;
+   }
+.options li { 
+  margin: 10px 0;
+ }
+.options button { 
+          width: 100%; 
+          padding: 15px;
+          border: 1px solid #ccc; 
+          border-radius: 10px;
+          background: #f9f9f9;
+          cursor: pointer; 
+          transition: 0.3s; 
+          font-size: 1em; 
+    }
+.options button:hover { 
+  background: #e8f0ff;
+ }
+.options button.correct { 
+  background: #a5d6a7;
+ }
+.options button.wrong { 
+  background: #ef9a9a; 
+}
+.navigation { 
+  display: flex; 
+  justify-content: space-between; 
+  margin-top: 15px; 
+  flex-wrap: wrap;
+ }
+.navigation button { 
+  padding: 12px 20px; 
+  border: none; 
+  border-radius: 8px; 
+  cursor: pointer; 
+  background: #1976d2;
+   color: white; 
+   margin-top:5px; 
+   flex:1; 
+   min-width:120px; 
+   margin-right:5px;
+    transition: 0.3s;
+   }
+.navigation button:last-child { 
+  margin-right:0; 
+}
+.navigation button:hover { 
+  background: #1259a7; 
+}
+.score {
+   margin-top: 20px; 
+   font-weight: bold;
+    color: #444; 
+    word-wrap: break-word; 
+  }
+.leaderboard { 
+  margin-top: 15px; 
+  padding: 10px; 
+  background: #f1f8e9; 
+  border-radius: 8px;
+   text-align: left; 
+   word-wrap: break-word; 
+  }
+.leaderboard h3 { 
+  margin: 0 0 8px; 
+  color: #2e7d32; 
+  font-size: 1em; 
+}
+.leaderboard ol { 
+  margin: 0;
+   padding-left: 20px; 
+  }
+.leaderboard li { 
+  margin: 4px 0; 
+  font-size: 14px;
+   color: #333;
+   }
+.timer { 
+  font-weight: bold;
+   color: #d32f2f; 
+   margin-bottom: 15px; 
+   font-size:1em; 
+  }
+#restart {
+   margin-top: 20px; 
+   padding: 12px 20px; 
+   border: none; 
+   border-radius: 8px; 
+   cursor: pointer; 
+   background: #43a047; 
+   color: white; 
+   display: none; 
+   width:100%; 
+   font-size:1em;
+   }
+#restart:hover { 
+  background: #2e7d32;
+ }
+#categorySelect {
+   margin-bottom: 15px; 
+   padding: 10px; 
+   border-radius: 6px; 
+   border: 1px solid #ccc; 
+   width: 100%;
+   font-size:1em; 
+   box-sizing:border-box; 
+  }
+#soundToggle { 
+  margin-bottom: 15px; 
+  padding: 10px 15px; 
+  border-radius: 6px; 
+  border: 1px solid #1976d2; 
+  background: #fff; 
+  cursor: pointer; 
+  color: #1976d2; 
+  font-weight: bold; 
+  width:100%; 
+  box-sizing:border-box; 
+  transition: 0.3s; 
+  font-size:1em;
+ }
+#soundToggle:hover { 
+  background: #1976d2; 
+  color: #fff;
+ }
+
+/* Progress Bar */
+.progress-container { 
+  width: 100%; 
+  background: #e0e0e0;
+   border-radius: 10px; 
+   height: 20px;
+    margin-bottom: 15px; 
+  }
+.progress-bar { 
+  height: 100%; 
+  width: 0%; 
+  background: #1976d2; 
+  border-radius: 10px;
+   transition: width 0.3s;
+   }
+
+/* Mobile adjustments */
+@media (max-width:480px){
+  .options button { 
+    padding: 18px; 
+    font-size:1.1em; 
+  }
+  .navigation button { 
+    flex: 100%; 
+    min-width: unset;
+     margin-right:0; 
+     margin-bottom:8px; 
+    }
+  h2 { font-size: 1em; }
+  .timer { font-size:0.95em; }
+}
+</style>
+</head>
+<body>
+<div class="quiz-container">
+  <select id="categorySelect">
+    <option value="mixed">Mixed Category (Random 20)</option>
+    <option value="all">All Categories</option>
+    <option value="HTML">HTML</option>
+    <option value="CSS">CSS</option>
+    <option value="JavaScript">JavaScript</option>
+    <option value="Python">Python</option>
+    <option value="SQL">SQL</option>
+  </select>
+
+  <button id="soundToggle">🔊 Sound On</button>
+
+  <div class="timer">Time Left: <span id="time">60</span>s</div>
+
+  <div class="progress-container">
+    <div class="progress-bar" id="progressBar"></div>
+  </div>
+
+  <h2 id="question">Question will appear here</h2>
+  <ul class="options" id="options"></ul>
+
+  <div class="navigation">
+    <button id="prev">Previous</button>
+    <button id="next">Next</button>
+  </div>
+
+  <div class="score" id="score"></div>
+
+  <div class="leaderboard" id="leaderboard">
+    <h3>🏆 Leaderboard (Top 5)</h3>
+    <ol id="leaderboardList"></ol>
+  </div>
+
+  <button id="restart">Restart Quiz</button>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+<script>
+// Same JS as previous with all features
+// Quiz data, shuffle, loadQuestion, checkAnswer, updateScore, progress bar, timer, leaderboard, restart, sound toggle
+const quizData = [
+  { category:"HTML", question: "Which tag is used to create a hyperlink?", options: ["<a>", "<link>", "<href>", "<url>"], answer: "<a>" },
+  { category:"HTML", question: "Which attribute is used to define inline styles?", options: ["style", "class", "font", "css"], answer: "style" },
+  { category:"HTML", question: "HTML stands for?", options: ["Hyperlinks and Text Markup Language", "Hyper Text Markup Language", "Home Tool Markup Language", "Hyper Text Markdown Language"], answer: "Hyper Text Markup Language" },
+  { category:"CSS", question: "Which property is used to change text color?", options: ["font-color", "color", "text-color", "fgcolor"], answer: "color" },
+  { category:"CSS", question: "Which CSS property controls layout spacing?", options: ["padding", "spacing", "margin", "border-spacing"], answer: "margin" },
+  { category:"CSS", question: "What does 'CSS' stand for?", options: ["Cascading Style Sheets", "Colorful Style Sheets", "Computer Style Sheets", "Creative Style Sheets"], answer: "Cascading Style Sheets" },
+  { category:"JavaScript", question: "Which is a JavaScript framework?", options: ["Django", "React", "Laravel", "Flask"], answer: "React" },
+  { category:"JavaScript", question: "Which symbol is used for comments in JS?", options: ["//", "<!-- -->", "#", "/* */"], answer: "//" },
+  { category:"JavaScript", question: "What is the output of: typeof 42?", options: ["number", "string", "object", "undefined"], answer: "number" },
+  { category:"JavaScript", question: "Which method adds an element to the end of a JS array?", options: ["push()", "pop()", "shift()", "unshift()"], answer: "push()" },
+  { category:"Python", question: "Which keyword defines a function in Python?", options: ["func", "def", "function", "define"], answer: "def" },
+  { category:"Python", question: "What is the output of print(2**3)?", options: ["6", "8", "9", "5"], answer: "8" },
+  { category:"Python", question: "Python is a _______ language?", options: ["Low-level", "High-level", "Assembly", "Machine"], answer: "High-level" },
+  { category:"Python", question: "Which Python keyword handles exceptions?", options: ["catch", "try", "except", "error"], answer: "try" },
+  { category:"SQL", question: "Which SQL command is used to fetch data?", options: ["SELECT", "GET", "FETCH", "SHOW"], answer: "SELECT" },
+  { category:"SQL", question: "Which clause is used to filter records?", options: ["WHERE", "ORDER BY", "GROUP BY", "HAVING"], answer: "WHERE" },
+  { category:"SQL", question: "Which statement is used to remove a table?", options: ["DELETE TABLE", "DROP TABLE", "REMOVE TABLE", "ERASE TABLE"], answer: "DROP TABLE" },
+  { category:"SQL", question: "Which SQL function counts rows?", options: ["COUNT()", "SUM()", "TOTAL()", "ROWS()"], answer: "COUNT()" }
+];
+
+let shuffledQuiz=[], currentQuestion=0, score=0, timer=60, interval, soundOn=true;
+
+const questionEl=document.getElementById("question");
+const optionsEl=document.getElementById("options");
+const scoreEl=document.getElementById("score");
+const leaderboardEl=document.getElementById("leaderboardList");
+const prevBtn=document.getElementById("prev");
+const nextBtn=document.getElementById("next");
+const timeEl=document.getElementById("time");
+const restartBtn=document.getElementById("restart");
+const categorySelect=document.getElementById("categorySelect");
+const progressBar=document.getElementById("progressBar");
+const soundToggle=document.getElementById("soundToggle");
+
+const correctSound = new Audio('https://www.soundjay.com/button/sounds/button-3.mp3');
+const wrongSound = new Audio('https://www.soundjay.com/button/sounds/button-10.mp3');
+
+let leaderboard = JSON.parse(localStorage.getItem("quizLeaderboard")) || [];
+updateLeaderboard();
+
+function shuffleArray(arr){ return arr.sort(()=>Math.random()-0.5); }
+
+function loadQuestion(){
+  const q=shuffledQuiz[currentQuestion];
+  questionEl.textContent=q.question;
+  optionsEl.innerHTML="";
+  shuffleArray([...q.options]).forEach(option=>{
+    const button=document.createElement("button");
+    button.textContent=option;
+    button.onclick=()=>checkAnswer(button,q.answer);
+    optionsEl.appendChild(document.createElement("li")).appendChild(button);
+  });
+  updateScore();
+  updateProgress();
+}
+
+function checkAnswer(button,answer){
+  if(button.textContent===answer){ 
+    button.classList.add("correct"); 
+    if(soundOn) correctSound.play(); 
+    score++; 
+  } else { 
+    button.classList.add("wrong"); 
+    if(soundOn) wrongSound.play(); 
+  }
+  Array.from(optionsEl.querySelectorAll("button")).forEach(btn=>btn.disabled=true);
+  updateScore();
+}
+
+function updateScore(){ scoreEl.textContent=`Score: ${score} / ${shuffledQuiz.length}`; }
+function updateProgress(){ progressBar.style.width=((currentQuestion+1)/shuffledQuiz.length)*100+"%"; }
+
+function startTimer(){
+  interval=setInterval(()=>{
+    timer--;
+    timeEl.textContent=timer;
+    if(timer<=0){ clearInterval(interval); endQuiz(); }
+  },1000);
+}
+
+function endQuiz(){
+  questionEl.textContent="🎉 Quiz Over!";
+  optionsEl.innerHTML="";
+  prevBtn.style.display="none";
+  nextBtn.style.display="none";
+  scoreEl.textContent=`Final Score: ${score} / ${shuffledQuiz.length}`;
+  confetti({ particleCount: 200, spread: 70, origin: { y: 0.6 } });
+
+  let timestamp = new Date().toLocaleString();
+  leaderboard.push({score,time:timestamp});
+  leaderboard.sort((a,b)=>b.score-a.score);
+  leaderboard=leaderboard.slice(0,5);
+  localStorage.setItem("quizLeaderboard",JSON.stringify(leaderboard));
+  updateLeaderboard();
+  let rank=leaderboard.findIndex(entry=>entry.score===score && entry.time===timestamp)+1;
+  if(rank>0){
+    let medal="🏅";
+    if(rank===1) medal="🥇"; else if(rank===2) medal="🥈"; else if(rank===3) medal="🥉";
+    let rankMsg=document.createElement("p");
+    rankMsg.style.fontWeight="bold";
+    rankMsg.style.color="#2e7d32";
+    rankMsg.textContent=`${medal} You are currently #${rank} on the leaderboard`;
+    scoreEl.appendChild(rankMsg);
+  }
+  restartBtn.style.display="inline-block";
+}
+
+function updateLeaderboard(){
+  leaderboardEl.innerHTML="";
+  leaderboard.forEach(entry=>{
+    const li=document.createElement("li");
+    li.textContent=`${entry.score} points - ${entry.time}`;
+    leaderboardEl.appendChild(li);
+  });
+}
+
+function restartQuiz(){
+  let category=categorySelect.value;
+  if(category==="all") shuffledQuiz=shuffleArray([...quizData]);
+  else if(category==="mixed") shuffledQuiz=shuffleArray([...quizData]).slice(0,20);
+  else shuffledQuiz=shuffleArray(quizData.filter(q=>q.category===category));
+  currentQuestion=0; score=0; timer=60;
+  clearInterval(interval);
+  startTimer();
+  prevBtn.style.display="inline-block";
+  nextBtn.style.display="inline-block";
+  restartBtn.style.display="none";
+  loadQuestion();
+}
+
+nextBtn.addEventListener("click",()=>{if(currentQuestion<shuffledQuiz.length-1){currentQuestion++; loadQuestion();} else {endQuiz();}});
+prevBtn.addEventListener("click",()=>{if(currentQuestion>0){currentQuestion--; loadQuestion();}});
+restartBtn.addEventListener("click",restartQuiz);
+categorySelect.addEventListener("change",restartQuiz);
+
+soundToggle.addEventListener("click", ()=>{
+  soundOn = !soundOn;
+  soundToggle.textContent = soundOn ? "🔊 Sound On" : "🔇 Sound Off";
+});
+
+restartQuiz();
+</script>
+</body>
+</html>
